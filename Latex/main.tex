@@ -6,7 +6,6 @@
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{fullpage}
-\usepackage{subfiles}
 \usepackage[hidelinks]{hyperref}
 \usepackage{graphicx}
 \usepackage{subfigure}
@@ -15,15 +14,24 @@
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{tikz}
 
-\graphicspath{ {./img/} }
+\usepackage{subfiles}
+
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\vect}[1]{\textbf{#1}}
+
+\newtheorem{theorem}{Theorem}[section] 
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}{Proposition}[section]
+
+\graphicspath{ {../img/} }
 
 \begin{document}
 
 \begin{titlepage}
 
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
-
-
 
 \center % Center everything on the page
  
@@ -70,13 +78,13 @@ Valerio \textsc{Colombo}\\[3cm] % Your name
 %	LOGO SECTION
 %----------------------------------------------------------------------------------------
 
-\includegraphics[scale=0.4]{img/Logo_Politecnico_Milano.png}\\[2cm] % Include a department/university logo - this will require the graphicx package
+\includegraphics[scale=0.4]{Logo_Politecnico_Milano.png}\\[2cm] % Include a department/university logo - this will require the graphicx package
 
 %----------------------------------------------------------------------------------------
 %	COPYRIGHT SECTION
 %----------------------------------------------------------------------------------------
 
-\includegraphics[scale=0.4]{img/Copyright.png}\\[1cm]
+\includegraphics[scale=0.4]{Copyright.png}\\[1cm]
 
 %----------------------------------------------------------------------------------------
 %	DATE SECTION
@@ -94,14 +102,14 @@ Valerio \textsc{Colombo}\\[3cm] % Your name
 
 \newpage
 
-\subfile{LinearRegression.tex}
-\subfile{LinearClassification.tex}
-\subfile{BiasVarianceTradeOff.tex}
-\subfile{PAC-Learning and VC-Dimension.tex}
-\subfile{KernelMethods.tex}
-\subfile{SupportVectorMachines.tex}
-\subfile{MDP.tex}
-\subfile{RLFinite.tex}
-\subfile{MAB.tex}
+\subfile{LinearRegression}
+\subfile{LinearClassification}
+\subfile{BiasVarianceTradeOff}
+\subfile{PAC-Learning and VC-Dimension}
+\subfile{KernelMethods}
+\subfile{SupportVectorMachines}
+\subfile{MDP}
+\subfile{RLFinite}
+\subfile{MAB}
 
 \end{document}
