@@ -65,45 +65,45 @@ There are different type of kernel
 Many linear models for regression and classification can be reformulated in terms of dual representation, in which the kernel function arises naturally. We want this in order to be able to apply the kernel trick. In practice we want to describe our model not using feature but with a kernel. For every linear model exist a dual representation involving kernels. Let's take as an example ridge regression.
 We recall that the loss function for ridge regression is
 \begin{equation*}
-    L_w = \frac{1}{2}\sum_{n=1}^N (w^T\phi(x_n) - t_n)^2 + \frac{\lambda}{2}w^T w
+    L_\vect{w} = \frac{1}{2}\sum_{n=1}^N (\vect{w}^T\phi(\vect{x}_n) - t_n)^2 + \frac{\lambda}{2}\vect{w}^T \vect{w}
 \end{equation*}
 and its gradient is
 \begin{align*}
-    \overset{w}{\nabla}L &= \frac{1}{2} 2 \sum_{n=1}^N (w^T\phi(x_n) - t_n) \phi(x_n)^T + \frac{\lambda}{2}2 w^T \\
-    &= \sum_{n=1}^N (w^T\phi(x_n) - t_n) \phi(x_n)^T + \lambda w^T
+    \overset{\vect{w}}{\nabla}L &= \frac{1}{2} 2 \sum_{n=1}^N (\vect{w}^T\phi(\vect{x}_n) - t_n) \phi(\vect{x}_n)^T + \frac{\lambda}{2}2 \vect{w}^T \\
+    &= \sum_{n=1}^N (\vect{w}^T\phi(\vect{x}_n) - t_n) \phi(\vect{x}_n)^T + \lambda \vect{w}^T
 \end{align*}
-Putting $\overset{w}{\nabla}L = 0$ we have
+Putting $\overset{\vect{w}}{\nabla}L = 0$ we have
 \begin{align*}
-    -\lambda w^T &= \sum_{n=1}^N (w^T\phi(x_n) - t_n) \phi(x_n)^T \\
-    w^T &= -\frac{1}{\lambda} \sum_{n=1}^N (w^T\phi(x_n) - t_n) \phi(x_n)^T \\
-    & \text{Define } a_n = -\frac{1}{\lambda} (w^T\phi(x_n) - t_n) \quad [1 \times 1]\\
-    &= \sum_{n=1}^N a_n \phi(x_n)^T \\
-    w &= \bigg( \sum_{n=1}^N a_n \phi(x_n)^T \bigg)^T \\
-    &= \sum_{n=1}^N (a_n \phi(x_n)^T)^T \\
-    &= \sum_{n=1}^N (\phi(x_n) a_n) \\
-    & \text{Define } \Phi = \begin{bmatrix}\begin{bmatrix}\phi^T(x_1)\end{bmatrix}\\ \vdots \\ \begin{bmatrix} \phi^T(x_N)\end{bmatrix}\end{bmatrix} \text{, and } a=\begin{bmatrix}a_1 \\ \vdots \\ a_N\end{bmatrix}\\
+    -\lambda \vect{w}^T &= \sum_{n=1}^N (\vect{w}^T\phi(\vect{x}_n) - t_n) \phi(\vect{w}_n)^T \\
+    \vect{x}^T &= -\frac{1}{\lambda} \sum_{n=1}^N (\vect{w}^T\phi(\vect{x}_n) - t_n) \phi(\vect{x}_n)^T \\
+    & \text{Define } a_n = -\frac{1}{\lambda} (\vect{w}^T\phi(\vect{x}_n) - t_n) \quad [1 \times 1]\\
+    &= \sum_{n=1}^N a_n \phi(\vect{x}_n)^T \\
+    \vect{w} &= \bigg( \sum_{n=1}^N a_n \phi(\vect{x}_n)^T \bigg)^T \\
+    &= \sum_{n=1}^N (a_n \phi(\vect{x}_n)^T)^T \\
+    &= \sum_{n=1}^N (\phi(\vect{x}_n) a_n) \\
+    & \text{Define } \Phi = \begin{bmatrix}\begin{bmatrix}\phi^T(\vect{x}_1)\end{bmatrix}\\ \vdots \\ \begin{bmatrix} \phi^T(\vect{x}_N)\end{bmatrix}\end{bmatrix} \text{, and } \vect{a}=\begin{bmatrix}a_1 \\ \vdots \\ a_N\end{bmatrix}\\
     &= \Phi^T a \quad [M \times 1]
 \end{align*}
-Now we can substitute w in the loss function. To make the computation simpler, we switch to full matrix notation
+Now we can substitute $\vect{w}$ in the loss function. To make the computation simpler, we switch to full matrix notation
 \begin{align*}
-    L_w &= \frac{1}{2}(\Phi w - t)^T(\Phi w - t)+\frac{\lambda}{2}w^T w \\
-    &= \frac{1}{2}(\Phi \Phi^T a - t)^T(\Phi \Phi^T a - t)+\frac{\lambda}{2}(\Phi^T a)^T \Phi^T a \\
-    &= \frac{1}{2}(\Phi \Phi^T a - t)^T(\Phi \Phi^T a - t)+\frac{\lambda}{2} a^T \Phi \Phi^T a \\
-    &= \frac{1}{2}((\Phi \Phi^T a)^T - t^T)(\Phi \Phi^T a - t)+\frac{\lambda}{2} a^T \Phi \Phi^T a \\
-    &= \frac{1}{2}(a^T \Phi \Phi^T - t^T)(\Phi \Phi^T a - t)+\frac{\lambda}{2} a^T \Phi \Phi^T a \\
-    &= \frac{1}{2}(a^T \Phi \Phi^T \Phi \Phi^T a) + \frac{1}{2}t^T t -\frac{1}{2} a^T \Phi \Phi^T t -\frac{1}{2} t^T \Phi \Phi^T a +\frac{\lambda}{2} a^T \Phi \Phi^T a \\
-    &= \frac{1}{2}(a^T \Phi \Phi^T \Phi \Phi^T a) + \frac{1}{2}t^T t - a^T \Phi \Phi^T t +\frac{\lambda}{2} a^T \Phi \Phi^T a
+    L_\vect{w} &= \frac{1}{2}(\Phi \vect{w} - \vect{t})^T(\Phi \vect{w} - \vect{t})+\frac{\lambda}{2}\vect{w}^T \vect{w} \\
+    &= \frac{1}{2}(\Phi \Phi^T \vect{a} - \vect{t})^T(\Phi \Phi^T \vect{a} - \vect{t})+\frac{\lambda}{2}(\Phi^T \vect{a})^T \Phi^T \vect{a} \\
+    &= \frac{1}{2}(\Phi \Phi^T \vect{a} - \vect{t})^T(\Phi \Phi^T \vect{a} - \vect{t})+\frac{\lambda}{2} \vect{a}^T \Phi \Phi^T \vect{} \\
+    &= \frac{1}{2}((\Phi \Phi^T \vect{a})^T - \vect{t}^T)(\Phi \Phi^T \vect{a} - \vect{t})+\frac{\lambda}{2} \vect{a}^T \Phi \Phi^T \vect{a} \\
+    &= \frac{1}{2}(\vect{a}^T \Phi \Phi^T - \vect{t}^T)(\Phi \Phi^T \vect{a} - \vect{t})+\frac{\lambda}{2} \vect{a}^T \Phi \Phi^T \vect{a} \\
+    &= \frac{1}{2}(\vect{a}^T \Phi \Phi^T \Phi \Phi^T \vect{a}) + \frac{1}{2}\vect{t}^T \vect{t} -\frac{1}{2} \vect{a}^T \Phi \Phi^T \vect{t} -\frac{1}{2} \vect{t}^T \Phi \Phi^T \vect{a} +\frac{\lambda}{2} \vect{a}^T \Phi \Phi^T \vect{a} \\
+    &= \frac{1}{2}(\vect{a}^T \Phi \Phi^T \Phi \Phi^T \vect{a}) + \frac{1}{2}\vect{t}^T \vect{t} - \vect{a}^T \Phi \Phi^T \vect{t} +\frac{\lambda}{2} \vect{a}^T \Phi \Phi^T \vect{a}
 \end{align*}
 We can observe how $\Phi$ is present only when multiplied by its transpose. In this way we can use the kernels we have define before to substitute the features. In order to have a simpler notation, we can observe that the kernel function is a Gram matrix\footnotemark $K=\Phi\Phi^T [N \times N]$, where each element is 
 \begin{equation*}
-    K_{nm} = \phi(x_n)^T \phi(x_m) = k(x_n,x_m)
+    K_{nm} = \phi(\vect{x}_n)^T \phi(\vect{x}_m) = k(\vect{x}_n,\vect{x}_m)
 \end{equation*}
 \begin{equation}
     K =
     \begin{bmatrix}
-    k(x_1,x_1) & \dots & k(x_1,x_N) \\ 
+    k(\vect{x}_1,\vect{x}_1) & \dots & k(\vect{x}_1,\vect{x}_N) \\ 
     \vdots & \ddots & \vdots \\
-    k(x_N,x_1) & \dots & k(x_N,x_N)
+    k(\vect{x}_N,\vect{x}_1) & \dots & k(\vect{x}_N,\vect{x}_N)
     \end{bmatrix}
 \end{equation}
 \footnotetext{Given N vectors, the Gram Matrix is the matrix of all inner products. A matrix by its transpose is always a Gram matrix}
@@ -114,37 +114,39 @@ We can observe how $\Phi$ is present only when multiplied by its transpose. In t
     \item K is a matrix of similarities of pairs of samples(metric)
     \item K is symmetric
 \end{itemize}
-Now we can substitute $\Phi^T \Phi$ with $K$. We write $L_w$ as $L_a$ because w is no longer present in the equation so $L_a$
+Now we can substitute $\Phi^T \Phi$ with $K$. We write $L_\vect{w}$ as $L_\vect{a}$ because $\vect{w}$ is no longer present in the equation so $L_1vect{a}$
 \begin{equation*}
-    L_a = \frac{1}{2}(a^T K K a) + \frac{1}{2}t^T t - a^T K t +\frac{\lambda}{2} a^T K a
+    L_\vect{a} = \frac{1}{2}(\vect{a}^T K K \vect{a}) + \frac{1}{2}\vect{t}^T \vect{t} - \vect{a}^T K \vect{t} +\frac{\lambda}{2} \vect{a}^T K \vect{a}
 \end{equation*}
-Solving for $a$ by combining $w=\Phi^T a$ and $a_n=-\frac{1}{\lambda}(w^T \phi(x_n)-t_n)$
+Solving for $\vect{a}$ by combining $\vect{w}=\Phi^T \vect{a}$ and $a_n=-\frac{1}{\lambda}(\vect{w}^T \phi(\vect{x}_n)-t_n)$
 \begin{equation}
-    a = (K + \lambda I_N)^{-1} t \quad [N \times 1]
+    \vect{a} = (K + \lambda I_N)^{-1} \vect{t} \quad [N \times 1]
 \end{equation} \label{eqn_a}
-Solution for $a$ can be expressed as a linear combination of elements of $\Phi$, whose coefficients are entirely in terms of kernel $k(\vect{x},\vect{x}')$, from
-which we can recover original formulation in terms of parameters $w$. This means that the loss function is convex thus it has only one global minimum. We can observe how all the element in equation (\ref{eqn_a}) have dimension dependent only on the number of samples. This is exactly what we were looking for, because we have said that the complexity of kernel methods depends on the number of samples and not features. It practically means that now we have to invert a $[N \times N]$ matrix instead of a $[M \times M]$.
+Solution for $\vect{a}$ can be expressed as a linear combination of elements of $\Phi$, whose coefficients are entirely in terms of kernel $k(\vect{x},\vect{x}')$, from
+which we can recover original formulation in terms of parameters $\vect{w}$. This means that the loss function is convex thus it has only one global minimum. We can observe how all the element in equation (\ref{eqn_a}) have dimension dependent only on the number of samples. This is exactly what we were looking for, because we have said that the complexity of kernel methods depends on the number of samples and not features. It practically means that now we have to invert a $[N \times N]$ matrix instead of a $[M \times M]$.
 
-When we make a prediction for a new x we have our linear regression model. If we substitute $w=\Phi^Ta$.
+When we make a prediction for a new x we have our linear regression model. If we substitute $\vect{w}=\Phi^T \vect{a}$.
 \begin{align*}
-    y(x) &= w^T\phi(x) \\
-    &= a^T\Phi \phi(x) \\
-    &\text{Define }k(x)=
+    y(\vect{x}) &= \vect{w}^T\phi(\vect{x}) \\
+    &= \vect{a}^T\Phi \phi(\vect{x}) \\
+    &\text{Define }k(\vect{x})=
     \begin{bmatrix}
-    k(x,x_1) \\
+    k(\vect{x},\vect{x}_1) \\
     \vdots \\
-    k(x,x_N)
+    k(\vect{x},\vect{x}_N)
     \end{bmatrix} \\
-    &= k(x)^T (K + \lambda I_N)^{-1} t
+    &= k(\vect{x})^T (K + \lambda I_N)^{-1} \vect{t}
 \end{align*}
 As we can see, the prediction is a linear combination of the target values from the training set. We can get a very nice intuition of this. Making a linear combination of the target values is like taking a weighted average over the target samples, based on the similarity between the new samples and the target samples in the training data. In this way, we have completely eliminated the parameters, so we have found a dual representation of the parametric model eliminating the need of parameters and features, for describing the model, by using kernels. So the "model" is now implicit in the data.
 This approach have several advantages
 \begin{itemize}
-    \item Solution for a is entirely described in terms of kernel functions. Once we get $a$ we can recover $w$ as a linear combination of $\Phi$ using $w = \Phi^T a$
+    \item Solution for $\vect{a}$ is entirely described in terms of kernel functions. Once we get $\vect{a}$ we can recover $\vect{w}$ as a linear combination of $\Phi$ using $\vect{w} = \Phi^T \vect{a}$
     \item When computing the solution we need to invert a $1 \times N$ matrix and not a $1 \times M$ matrix. This is good when the number of features is very high
     \item The true advantage is that for some kernel, we don't even need to compute $\Phi$. Doing so we resolve a lot of issues revolving around the high number of features. We will see how we can work even with infinite features.
     \item Kernel functions can be defined not only over simply vectors of real numbers, but also over objects as diverse as graphs, sets, string, and text documents
 \end{itemize}
+
+{\huge{TODO}}
 
 \subsubsection{Kernel construction}
 In this section we will see how we can construct a kernel. If you are wondering how the heck we can avoid to compute $\Phi$ directly, even if $K=\Phi^T \Phi$, you are in the right section.
