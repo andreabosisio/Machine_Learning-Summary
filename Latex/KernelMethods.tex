@@ -146,33 +146,31 @@ This approach have several advantages
     \item Kernel functions can be defined not only over simply vectors of real numbers, but also over objects as diverse as graphs, sets, string, and text documents
 \end{itemize}
 
-{\huge{TODO}}
-
 \subsubsection{Kernel construction}
 In this section we will see how we can construct a kernel. If you are wondering how the heck we can avoid to compute $\Phi$ directly, even if $K=\Phi^T \Phi$, you are in the right section.
 So the most naive way to construct a kernel is through the scalar product of $\Phi$ by its transpose. Nothing special, in fact we don't have any special gain doing this because we still need to use $\Phi$.
 \begin{equation*}
-    k(x,x') = \Phi(x)^T \Phi(x') = \sum_{i=1}^M \Phi_i(x) \Phi_i(x')
+    k(\vect{x},\vect{x}') = \Phi(\vect{x})^T \Phi(\vect{x}') = \sum_{i=1}^M \Phi_i(\vect{x}) \Phi_i(\vect{x}')
 \end{equation*}
-Where $\Phi(x)$ are basis functions.
+Where $\Phi(\vect{x})$ are basis functions.
 
 It exist a second and much more interesting method to construct kernels. We can choose a kernel function that correspond to a scalar product in some space. We make an example to better understand what it means.
-\paragraph{Example - Kernel construction}Suppose to have the kernel function $k(x, z) = (x^T z)^2$.
+\paragraph{Example - Kernel construction}Suppose to have the kernel function $k(\vect{x}, \vect{z}) = (\vect{x}^T \vect{z})^2$.
 To be a valid kernel we need to find a features expansion that is able to provide the same result as the initial kernel definition. Suppose we are in two dimensional space.
 \begin{align*}
-    k(x,z) &= (x^T z)^2 \\
+    k(\vect{x},\vect{z}) &= (\vect{x}^T \vect{z})^2 \\
     &= (x_1z_1 + x_2z_2)^2 \\
     &= x_1^2z_1^2 + 2x_1z_1x_2z_2 + x_2^2z_2^2 \\
     &= \begin{bmatrix} x_1^2 & \sqrt{2}x_1x_2 & x_2^2\end{bmatrix}\begin{bmatrix} z_1^2 & \sqrt{2}z_1z_2 & z_2^2\end{bmatrix}^T \\
-    &= \Phi(x)^T \Phi(z)
+    &= \Phi(\vect{x})^T \Phi(\vect{z})
 \end{align*}
-So what's the point? We have checked if $k(x,z)$ is a valid kernel by finding a feature expansion whose inner product is equal to the kernel. Furthermore we can notice that the feature mapping takes the form $\begin{bmatrix} x_1^2 & \sqrt{2}x_1x_2 & x_2^2\end{bmatrix}$, comprising all second order terms with a specific weighting. The very nice thing about this is that we can avoid to compute $\Phi$ and then perform the scalar product, because we can directly estimate the kernel function(metric). Computing directly the kernel is way cheaper than computing $\Phi$.
+So what's the point? We have checked if $k(\vect{x},\vect{z})$ is a valid kernel by finding a feature expansion whose inner product is equal to the kernel. Furthermore we can notice that the feature mapping takes the form $\begin{bmatrix} x_1^2 & \sqrt{2}x_1x_2 & x_2^2\end{bmatrix}$, comprising all second order terms with a specific weighting. The very nice thing about this is that we can avoid to compute $\Phi$ and then perform the scalar product, because we can directly estimate the kernel function(metric). Computing directly the kernel is way cheaper than computing $\Phi$.
 In this case we have
 \begin{itemize}
     \item \textbf{Naive kernel construction}: compute 6 features values and 9 multiplication for inner product
     \item \textbf{Direct estimation of valid kernel}: 2 multiplication and a squaring
 \end{itemize}
-This is a very simple example and the gain is very small. If we consider the kernel $k(x,z) = (x^T z + c)^p$, we can demonstrate that the feature expansion that represent this kernel includes all the possible monomial from degree 0 to p.
+This is a very simple example and the gain is very small. If we consider the kernel $k(\vect{x},\vect{z}) = (\vect{x}^T \vect{z} + c)^p$, we can demonstrate that the feature expansion that represent this kernel includes all the possible monomial from degree 0 to p.
 \begin{itemize}
     \item \textbf{Naive kernel construction}: exponential grow in number of operation
     \item \textbf{Direct estimation of valid kernel}: linear grow in number of operation
@@ -181,51 +179,51 @@ We can represent features expansion that include billions of elements with very 
 In this way we have constructed a memory based method which doesn't use both features and weights, but it exploit the training data only to predict new samples.
 
 Now we can define more formally how we can demonstrate that a given kernel is valid.
-Necessary and sufficient condition for a function $k(x, x')$ to be a kernel is that the gram matrix $K$, whose elements are given by $k(x_n, x_m)$, is positive semi-definite\footnotemark for all possible choices of the set $\{x_n\}$.
-\footnotetext{Positive semi-definite means that $x^T K x \geq 0,$ $\forall x:x_i\in \mathbb{R}^+$}
+Necessary and sufficient condition for a function $k(\vect{x}, \vect{x}')$ to be a kernel is that the gram matrix $K$, whose elements are given by $k(\vect{x}_n, \vect{x}_m)$, is positive semi-definite\footnotemark for all possible choices of the set $\{\vect{x}_n\}$.
+\footnotetext{Positive semi-definite means that $\vect{x}^T K \vect{x} \geq 0,$ $\forall \vect{x}:x_i\in \mathbb{R}^+$}
 \begin{theorem}[Mercer’s theorem]
-Any continuous, symmetric, positive semi-definite kernel function $k(x, y)$ can be expressed as a dot product in a high-dimensional space
+Any continuous, symmetric, positive semi-definite kernel function $k(\vect{x}, \vect{y})$ can be expressed as a dot product in a high-dimensional space
 \end{theorem}
 New kernels can be constructed from simpler kernels as building blocks.
 Be aware that a really meaningful kernel is the one that define a good metric for representing the similarity between two inputs. 
-So given kernels $k_1(x,x')$ and $k_2(x,x')$, the following new kernels will be
+So given kernels $k_1(\vect{x},\vect{x}')$ and $k_2(\vect{x},\vect{x}')$, the following new kernels will be
 valid
 \begin{enumerate}
-    \item $k(x,x') = ck_1(x,x')$
-    \item $k(x,x') = f(x)k_1(x,x')f(x')$, where $f(\cdot)$ is any function
-    \item $k(x,x') = q(k_1(x,x'))$, where $q(\cdot)$ is a polynomial with non-negative coefficients
-    \item $k(x,x') = exp(k_1(x,x'))$
-    \item $k(x,x')$ = $k_1(x,x')+k_2(x,x')$
-    \item $k(x,x')=k_1(x,x')k_2(x,x')$
-    \item $k(x,x')=k(\Phi(x),\Phi(x'))$, where $\Phi(x)$ is a function from x to $\mathbb{R}^M$
-    \item $k(x,x') = x^TAx'$, where $A$ is a positive semi-definite matrix
-    \item $k(x,x') = k_a(x_a,x_a') + k_b(x_b,x_b')$, where $x_a$ and $x_b$ are variables with $x=(x_a,x_b)$
-    \item $k(x,x')=k_a(x_a,x_a') k_b(x_b,x_b')$
+    \item $k(\vect{x},\vect{x}') = ck_1(\vect{x},\vect{x}')$
+    \item $k(\vect{x},\vect{x}') = f(\vect{x})k_1(\vect{x},\vect{x}')f(\vect{x}')$, where $f(\cdot)$ is any function
+    \item $k(\vect{x},\vect{x}') = q(k_1(\vect{x},\vect{x}'))$, where $q(\cdot)$ is a polynomial with non-negative coefficients
+    \item $k(\vect{x},\vect{x}') = exp(k_1(\vect{x},\vect{x}'))$
+    \item $k(\vect{x},\vect{x}')$ = $k_1(\vect{x},\vect{x}')+k_2(\vect{x},\vect{x}')$
+    \item $k(\vect{x},\vect{x}')=k_1(\vect{x},\vect{x}')k_2(\vect{x},\vect{x}')$
+    \item $k(\vect{x},\vect{x}')=k(\Phi(\vect{x}),\Phi(\vect{x}'))$, where $\Phi(\vect{x})$ is a function from \vect{x} to $\mathbb{R}^M$
+    \item $k(\vect{x},\vect{x}') = \vect{x}^TA\vect{x}'$, where $A$ is a positive semi-definite matrix
+    \item $k(\vect{x},\vect{x}') = k_a(\vect{x}_a,\vect{x}_a') + k_b(\vect{x}_b,\vect{x}_b')$, where $\vect{x}_a$ and $\vect{x}_b$ are variables with $\vect{x}=(\vect{x}_a,\vect{x}_b)$
+    \item $k(\vect{x},\vect{x}')=k_a(\vect{x}_a,\vect{x}_a') k_b(\vect{x}_b,\vect{x}_b')$
 \end{enumerate}
 \paragraph{Example - Gaussian kernel} A commonly used homogeneous kernel is the Gaussian kernel.
 \begin{equation}
-    k(x,x') = exp \bigg(-\frac{\|x-x'\|^2}{2\sigma^2} \bigg)
+    k(\vect{x},\vect{x}') = exp \bigg(-\frac{\|\vect{x}-\vect{x}'\|^2}{2\sigma^2} \bigg)
 \end{equation}
-Being an homogeneous kernel, it's based on a distance metric. In particular $\|x-x'\|^2$ represent the euclidean distance between $x$ and $x'$.
+Being an homogeneous kernel, it's based on a distance metric. In particular $\|\vect{x}-\vect{x}'\|^2$ represent the euclidean distance between $\vect{x}$ and $\vect{x}'$.
 \begin{proof}[Gaussian kernel validity]
 We can demonstrate its validity through kernel composition.
 We can expand the square as
 \begin{equation*}
-    \|x-x'\|^2 = x^Tx + x'^Tx' -2x^Tx'
+    \|\vect{x}-\vect{x}'\|^2 = \vect{x}^T \vect{x} + \vect{x}'^T \vect{x}' - 2 \vect{x}^T \vect{x}'
 \end{equation*}
 To give
 \begin{align*}
-    k(x,x') &= exp(-\frac{1}{2\sigma^2} k_1(x,x')), \quad \text{where} \\
-    k_1(x,x') &= x^Tx + x'^Tx' - 2x^Tx'
+    k(\vect{x},\vect{x}') &= exp(-\frac{1}{2\sigma^2} k_1(\vect{x},\vect{x}')), \quad \text{where} \\
+    k_1(\vect{x},\vect{x}') &= \vect{x}^T \vect{x} + \vect{x}'^T \vect{x}' - 2 \vect{x}^T \vect{x}'
 \end{align*}
-We know that the exponential of a valid kernel is still valid(4) so we need to demonstrate that $-\frac{1}{2\sigma^2}k_1(x,x')$ is valid.
-For composition (1) we need to demonstrate that $k_1(x,x')$ is valid because $\frac{1}{2\sigma^2}$ is only a coefficient. We also know that for (5) the sum of valid kernel is still valid, so we need to verify the components of $k_1(x,x')$. All three components are just linear kernels with some coefficient(1), so they are valid.
+We know that the exponential of a valid kernel is still valid(4) so we need to demonstrate that $-\frac{1}{2\sigma^2}k_1(\vect{x},\vect{x}')$ is valid.
+For composition (1) we need to demonstrate that $k_1(\vect{x},\vect{x}')$ is valid because $\frac{1}{2\sigma^2}$ is only a coefficient. We also know that for (5) the sum of valid kernel is still valid, so we need to verify the components of $k_1(\vect{x},\vect{x}')$. All three components are just linear kernels with some coefficient(1), so they are valid.
 \end{proof}
 Here we can appreciate the power of kernel composition. In fact, we don't know which is the feature expansion of the Gaussian kernel, but we are sure that it exists. This is once more a demonstration of how kernel methods don't need to define the features. Still, they correspond to the dual representation of a parametric model, where, in the case of Gaussian kernel, the number of features is infinite.
 
 We can also expand the Gaussian kernel to non-Euclidean distances
 \begin{equation}
-    k(x,x') = exp\bigg( -\frac{1}{2\sigma^2}(k_i(x,x) + k_i(x',x') - 2k_i(x,x'))  \bigg)
+    k(\vect{x},\vect{x}') = exp\bigg( -\frac{1}{2\sigma^2}(k_i(\vect{x},\vect{x}) + k_i(\vect{x}',\vect{x}') - 2k_i(\vect{x},\vect{x}'))  \bigg)
 \end{equation}
 
 \paragraph{Object kernels}
@@ -235,11 +233,14 @@ We have said how kernels can be defined over real vector numbers but also object
     k(A_1,A_2) = 2^{|A_1 \cap  A_2|}
 \end{equation}
 In practice, we find the number elements included in both $A_1$ and $A_2$. Then we use this number as an exponent.
-\paragraph{Example - Generative models} We define the generative model $p(x)$ which is a mapping in a one-dimensional feature space. The kernel is defined as
+\paragraph{Example - Generative models} We define the generative model $p(\vect{x})$ which is a mapping in a one-dimensional feature space. The kernel is defined as
 \begin{equation}
-    k(x,x') = p(x)p(x')
+    k(\vect{x},\vect{x}') = p(\vect{x})p(\vect{x}')
 \end{equation}
-p(x) represent a probability. Performing the multiplication between $p(x)$ and $p(x')$ is like doing a inner product in a one-dimensional space so the kernel is valid. In practice we are multiplying the probability of $x$ and $x'$. So the kernel defines the probability of having both $x$ and $x'$ and so their "similarity".
+$p(\vect{x})$ represent a probability. Performing the multiplication between $p(\vect{x})$ and $p(\vect{x}')$ is like doing a inner product in a one-dimensional space so the kernel is valid. In practice we are multiplying the probability of $\vect{x}$ and $\vect{x}'$. So the kernel defines the probability of having both $\vect{x}$ and $\vect{x}'$ and so their "similarity".
+
+
+{\huge{TODO}}
 
 \subsection{Gaussian processes}
 In the previous sections, we have seen how we can find the dual representation of ridge regression based on kernels. Gaussian processes are the kernel version of the Bayesian linear regression when we assume a Gaussian distribution for both prior and likelihood. So far, we have seen how to find the dual model of a non-probabilistic model for regression like ridge regression. We can extend the dual formulation to probabilistic discriminative models.
